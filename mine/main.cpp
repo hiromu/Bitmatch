@@ -9,8 +9,9 @@ const int kSearchDepth = 3;
 const int kNegativeInfinity = INT_MIN;
 const int kInfinity = INT_MAX;
 const int kMyWeight     = 2;
-const int kOppWeight    = 2;
+const int kOppWeight    = 4;
 const int kWinWeight    = 10;
+const int kLoseWeight   = 20;
 
 enum Finger {
     kMyLeftIndex    = 1<<0,
@@ -97,6 +98,8 @@ int evaluate(unsigned short state) {
     int i, j, value = 0;
     if ((state & 0xff00) == 0xff00)
         return kWinWeight;
+    if ((state & 0x00ff) == 0x00ff)
+        return kLoseWeight * -1;
     for (i = 0; i < 2; i++) {
         for (j = 0; j < 2; j++) {
             if (((state>>(which_player[i] + which_hand[j]))&0x0f) == 0x0f) {
@@ -147,7 +150,7 @@ int main(void) {
         cout << "Success" << endl;
     else
         cout << "Fail" << endl;
-    if (evaluate(0x00ff) == kMyWeight * -2)
+    if (evaluate(0x00ff) == kLoseWeight * -1)
         cout << "Success" << endl;
     else
         cout << "Fail" << endl;
