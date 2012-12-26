@@ -4208,11 +4208,12 @@ int main(void)
 
 		fin=btoi(finger);
 		bool flag=true;
+		int t;
 
 		for (int me=0;me<2 && flag;me++) {
-			for (int you=0;you<2 && flag;you++) {
-				for (int shift=-3;shift<3 && flag;shift++) {
-					if (data[fin] == (doxor(fin,me,you,shift,false) & 0xFF)) {
+			if (!IsKilled(fin,me,0)) for (int you=0;you<2 && flag;you++) {
+				if (!IsKilled(fin,you,1)) for (int shift=-3;shift<=3 && flag;shift++) {
+					if (data[fin] == ((t=doxor(fin,me,you,shift,false)) & 0xFF)) {
 						printf( "%d %d %d\n", me, you, shift );
 						flag=false;
 					}
