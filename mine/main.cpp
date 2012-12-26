@@ -1,5 +1,6 @@
 #include <cstdlib>
 #include <climits>
+#include <ctime>
 #include <iostream>
 #include <algorithm>
 #include <vector>
@@ -319,6 +320,7 @@ int main(void) {
                 }
             }
         }
+        srand((unsigned int)time(NULL));
         operation = candidates.at(rand() % candidates.size());
 
         cout << (operation&1) << " " << ((operation >> 1)&1) << " " << ((operation >> 2) - 3) << endl;
