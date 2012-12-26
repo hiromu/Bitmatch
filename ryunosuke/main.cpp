@@ -1,13 +1,7 @@
 #include<stdio.h>
-typedef struct{
-	int x,y,z,c;
-}T;
-T dp[16][16][16][16];
-T win={0,0,-3,1};
-T lose={0,0,-3,-1};
-T init={-1,-1,-1,0};
-T imp={0,0,-3,0};
 int t;
+int my[2]={0,0},en[2]={0,0};
+int min(int a,int b){return a<b?a:b;}
 int max(int a,int b){return a>b?a:b;}
 int sft(int x,int z){
 	int p;
@@ -20,78 +14,116 @@ int calc(int x,int y,int z){
 	int ans=p^y;
 	return ans;
 }
-int dfs(bool bt,int x,int m[2],int e[2],bool used[16][16][16][16]){
+int dfs(bool bt,int x,int m[2],int e[2]){
 	int i,j,k;
-	if(used[m[0]][m[1]][e[0]][e[1]])return -1;
-	if(dp[m[0]][m[1]][e[0]][e[1]].x!=-1)return dp[m[0]][m[1]][e[0]][e[1]].c;
-	if(x>1000){
-		dp[m[0]][m[1]][e[0]][e[1]]=imp;
-		return 0;
+	if(x>=t+4||x>1000){
+		int p=0;
+		if(m[0]==15)p-=3;
+		if(m[1]==15)p-=3;
+		if(e[0]==15)p+=8;
+		if(e[1]==15)p+=8;
+		return p;
 	}
-	int data[2][2][7];
 	for(i=0;i<2;i++){
 		for(j=0;j<2;j++){
 			for(k=-3;k<=3;k++){
-				data[i][j][k+3]=-1;
-				int nm[2]={m[0],m[1]};
-				int ne[2]={e[0],e[1]};
 				if(bt){
 					if(m[i]==15||e[j]==15)continue;
 					int p=calc(m[i],e[j],k);
-					if(ne[j]==p)continue;
-					ne[j]=p;
-					used[m[0]][m[1]][e[0]][e[1]]=true;
-					data[i][j][k+3]=dfs(false,x+1,nm,ne,used);
-					used[m[0]][m[1]][e[0]][e[1]]=false;
+					int nm[2]={m[0],m[1]};
+					int ne[2]={e[0],e[1]};
+					if(p==ne[j])continue;
+					if(p==15)return 20+x-t;
 				}
 				else{
 					if(e[i]==15||m[j]==15)continue;
 					int p=calc(e[i],m[j],k);
-					if(nm[j]==p)continue;
+					int nm[2]={m[0],m[1]};
+					int ne[2]={e[0],e[1]};
+					if(p==nm[j])continue;
 					nm[j]=p;
-					used[m[0]][m[1]][e[0]][e[1]]=true;
-					data[i][j][k+3]=dfs(true,x+1,nm,ne,used);
-					used[m[0]][m[1]][e[0]][e[1]]=false;
-				}
-				if(data[i][j][k+3]==1){
-					T te={i,j,k,1};
-					dp[m[0]][m[1]][e[0]][e[1]]=te;
+					if(p==15)return -20;
 				}
 			}
 		}
 	}
-	if(dp[m[0]][m[1]][e[0]][e[1]].c==1)return 1;
-	for(i=0;i<2;i++)for(j=0;j<2;j++)for(k=0;k<7;k++){
-		if(data[i][j][k]==0){
-			T te={i,j,k,0};
-			dp[m[0]][m[1]][e[0]][e[1]]=te;
-			return 0;
+	int a;
+	if(bt)a=-20;
+	else a=20;
+	for(i=0;i<2;i++){
+		for(j=0;j<2;j++){
+			for(k=-3;k<=3;k++){
+				if(bt){
+					if(m[i]==15||e[j]==15)continue;
+					int p=calc(m[i],e[j],k);
+					int nm[2]={m[0],m[1]};
+					int ne[2]={e[0],e[1]};
+					if(p==ne[j])continue;
+					ne[j]=p;
+					a=max(a,dfs(false,x+1,nm,ne));
+				}
+				else{
+					if(e[i]==15||m[j]==15)continue;
+					int p=calc(e[i],m[j],k);
+					int nm[2]={m[0],m[1]};
+					int ne[2]={e[0],e[1]};
+					if(p==nm[j])continue;
+					nm[j]=p;
+					a=min(a,dfs(true,x+1,nm,ne));
+				}
+			}
 		}
 	}
-	T te={0,0,-3,-1};
-	dp[m[0]][m[1]][e[0]][e[1]]=te;
-	return -1;
+	return a;
 }
 int main(){
-	int i,j,k,l;
-	int my[2]={8,1},en[2]={1,8};
-	bool used[16][16][16][16];
-	for(i=0;i<16;i++)for(j=0;j<16;j++)for(k=0;k<16;k++)for(l=0;l<16;l++){
-		dp[i][j][k][l]=init;
-		used[i][j][k][l]=false;
-	}
-	for(i=0;i<16;i++)for(j=0;j<16;j++)dp[i][j][15][15]=win;
-	for(i=0;i<16;i++)for(j=0;j<16;j++)dp[15][15][i][j]=lose;
-	dfs(true,0,my,en,used);
+	int i,j,k;
 	while(1){
+start:	
 	scanf("%d",&t);
-	for(i=0;i<4;i++){int x;scanf("%d",&x);my[0]|=x<<i;}
-	for(i=0;i<4;i++){int x;scanf("%d",&x);my[1]|=x<<i;}
-	for(i=0;i<4;i++){int x;scanf("%d",&x);en[0]|=x<<i;}
-	for(i=0;i<4;i++){int x;scanf("%d",&x);en[1]|=x<<i;}
-	int x=dp[my[0]][my[1]][en[0]][en[1]].x;
-	int y=dp[my[0]][my[1]][en[0]][en[1]].y;
-	int z=dp[my[0]][my[1]][en[0]][en[1]].z;	
+	my[0]=0;my[1]=0;
+	en[0]=0;en[1]=0;
+	for(i=0;i<4;i++){int x;scanf("%d",&x);my[0]+=x<<i;}
+	for(i=0;i<4;i++){int x;scanf("%d",&x);my[1]+=x<<i;}
+	for(i=0;i<4;i++){int x;scanf("%d",&x);en[0]+=x<<i;}
+	for(i=0;i<4;i++){int x;scanf("%d",&x);en[1]+=x<<i;}
+	int x=0,y=0,z=-3;
+	int d[2][2][7];
+	int mx=0;
+	for(i=0;i<2;i++){
+		for(j=0;j<2;j++){
+			for(k=-3;k<=3;k++){
+				d[i][j][k]=-100;
+				if(my[i]==15||en[j]==15)continue;
+				int nm[2]={my[0],my[1]};
+				int ne[2]={en[0],en[1]};
+				int q=calc(my[i],en[j],k);
+				if(q==ne[j])continue;
+				if(q==15){
+					printf("%d %d %d\n",i,j,k);
+					fflush(stdout);
+					goto start;
+				}
+				ne[j]=q;
+				d[i][j][k+3]=dfs(false,t+1,nm,ne);
+				if(d[x][y][z+3]<d[i][j][k+3]){
+					x=i;y=j;z=k;
+					mx=0;
+					for(int l=0;l<4;l++){mx+=(ne[0]>>l)&1;}
+					for(int l=0;l<4;l++){mx+=(ne[1]>>l)&1;}
+				}
+				else if(d[x][y][z+3]==d[i][j][k+3]){
+					int yn=0;
+					for(int l=0;l<4;l++){yn+=(ne[0]>>l)&1;}
+					for(int l=0;l<4;l++){yn+=(ne[1]>>l)&1;}
+					if(yn>mx){
+						x=i;y=j;z=k;
+						mx=yn;
+					}
+				}
+			}
+		}
+	}
 	printf("%d %d %d\n",x,y,z);
 	fflush(stdout);
 	}
