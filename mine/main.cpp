@@ -5,11 +5,6 @@
 #include <algorithm>
 #include <vector>
 
-#ifndef TEST
-#define NODEBUG
-#endif
-#include <cassert>
-
 const int kSearchDepth = 3;
 const int kNegativeInfinity = INT_MIN;
 const int kInfinity = INT_MAX;
