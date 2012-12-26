@@ -1,5 +1,14 @@
 # Bitmatch Battle System
 
+
+## Usage
+
+    ./main.py [先攻の実行ファイル/実行コマンド] [後攻の実行ファイル/実行コマンド]
+
+以下のように、コマンドを指定するか、実行ファイルを指定することで対戦がスタートする。
+
+    ./main.py "python sample/main.py" sample/main.py
+
 ## Input
 
 [ターン数(0-Indexed)]  
